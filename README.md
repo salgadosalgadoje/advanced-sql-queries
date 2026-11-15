@@ -11,10 +11,12 @@ Each problem folder contains:
 - `schema.sql` — table definitions and sample data
 - `solution.sql` — the query logic used to solve the challenge
 
-The repository currently includes solutions for two classic SQL problems:
+The repository currently includes solutions for four classic SQL problems:
 
 - `Combine Two Tables`
 - `Second Highest Salary`
+- `Nth Highest Salary`
+- `Rank Scores`
 
 ## Repository Structure
 
@@ -25,7 +27,13 @@ advanced-sql-queries/
     ├── 0175_combine_two_tables/
     │   ├── schema.sql
     │   └── solution.sql
-    └── 0176_second_highest_salary/
+    ├── 0176_second_highest_salary/
+    │   ├── schema.sql
+    │   └── solution.sql
+    ├── 0177_nth_highest_salary/
+    │   ├── schema.sql
+    │   └── solution.sql
+    └── 0178_rank_scores/
         ├── schema.sql
         └── solution.sql
 ```
@@ -55,6 +63,29 @@ Key concept:
 The solution is implemented in:
 - `LeetCode/0176_second_highest_salary/solution.sql`
 
+### LeetCode 177: Nth Highest Salary
+
+This problem demonstrates how to retrieve the Nth-highest distinct salary while returning `NULL` if fewer than N distinct salaries exist.
+
+Key concept:
+- Reject non-positive N values by returning `NULL`
+- Decrement N to convert the requested rank to a zero-based offset
+- Use `DISTINCT` and descending order to find the requested salary
+
+The solution is implemented in:
+- `LeetCode/0177_nth_highest_salary/solution.sql`
+
+### LeetCode 178: Rank Scores
+
+This problem demonstrates how to rank scores in descending order while assigning tied scores the same rank and leaving no gaps.
+
+Key concept:
+- Use `DENSE_RANK()` as a window function to assign consecutive ranks across ties
+- Order the final results by score descending
+
+The solution is implemented in:
+- `LeetCode/0178_rank_scores/solution.sql`
+
 ## Database Setup
 
 Run the schema script first to create the required tables and sample data for a challenge:
@@ -76,6 +107,20 @@ SOURCE LeetCode/0176_second_highest_salary/schema.sql;
 SOURCE LeetCode/0176_second_highest_salary/solution.sql;
 ```
 
+For the Nth-highest-salary challenge:
+
+```sql
+SOURCE LeetCode/0177_nth_highest_salary/schema.sql;
+SOURCE LeetCode/0177_nth_highest_salary/solution.sql;
+```
+
+For the rank-scores challenge:
+
+```sql
+SOURCE LeetCode/0178_rank_scores/schema.sql;
+SOURCE LeetCode/0178_rank_scores/solution.sql;
+```
+
 If you are using a MySQL client directly, the equivalent commands are:
 
 ```bash
@@ -84,6 +129,12 @@ mysql -u <username> -p < LeetCode/0175_combine_two_tables/solution.sql
 
 mysql -u <username> -p < LeetCode/0176_second_highest_salary/schema.sql
 mysql -u <username> -p < LeetCode/0176_second_highest_salary/solution.sql
+
+mysql -u <username> -p < LeetCode/0177_nth_highest_salary/schema.sql
+mysql -u <username> -p < LeetCode/0177_nth_highest_salary/solution.sql
+
+mysql -u <username> -p < LeetCode/0178_rank_scores/schema.sql
+mysql -u <username> -p < LeetCode/0178_rank_scores/solution.sql
 ```
 
 ## How the Solutions Work
@@ -121,6 +172,45 @@ This ensures:
 - only distinct salaries are considered
 - the highest salary is skipped to reach the second value
 - the result is `NULL` when no second salary exists
+
+### Nth-highest salary function
+
+```sql
+CREATE FUNCTION getNthHighestSalary(N INT) RETURNS INT
+BEGIN
+    IF N <= 0 THEN
+        RETURN NULL;
+    END IF;
+
+    SET N = N - 1;
+    RETURN (
+        SELECT DISTINCT salary
+        FROM Employee
+        ORDER BY salary DESC
+        LIMIT 1 OFFSET N
+    );
+END
+```
+
+This ensures:
+- only distinct salaries are ranked
+- the requested rank maps to the correct zero-based offset
+- `NULL` is returned for non-positive N or when fewer than N distinct salaries exist
+
+### Dense ranking approach for Rank Scores
+
+```sql
+SELECT
+    score,
+    DENSE_RANK() OVER (ORDER BY score DESC) AS 'rank'
+FROM Scores
+ORDER BY score DESC;
+```
+
+This ensures:
+- tied scores share the same rank
+- ranks remain consecutive with no gaps
+- results are returned in descending score order
 
 ## Goals
 
