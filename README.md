@@ -11,12 +11,13 @@ Each problem folder contains:
 - `schema.sql` — table definitions and sample data
 - `solution.sql` — the query logic used to solve the challenge
 
-The repository currently includes solutions for four classic SQL problems:
+The repository currently includes solutions for five classic SQL problems:
 
 - `Combine Two Tables`
 - `Second Highest Salary`
 - `Nth Highest Salary`
 - `Rank Scores`
+- `Consecutive Numbers`
 
 ## Repository Structure
 
@@ -33,7 +34,10 @@ advanced-sql-queries/
     ├── 0177_nth_highest_salary/
     │   ├── schema.sql
     │   └── solution.sql
-    └── 0178_rank_scores/
+    ├── 0178_rank_scores/
+    │   ├── schema.sql
+    │   └── solution.sql
+    └── 0180_consecutive_numbers/
         ├── schema.sql
         └── solution.sql
 ```
@@ -86,6 +90,18 @@ Key concept:
 The solution is implemented in:
 - `LeetCode/0178_rank_scores/solution.sql`
 
+### LeetCode 180: Consecutive Numbers
+
+This problem demonstrates how to detect values that appear at least three times in consecutive rows based on the `id` ordering.
+
+Key concept:
+- Use window functions such as `LAG()` and `LEAD()` to compare each record with its immediate neighbors
+- Filter for rows where the current value matches both adjacent values
+- Remove duplicates with `DISTINCT` to keep the result set clean
+
+The solution is implemented in:
+- `LeetCode/0180_consecutive_numbers/solution.sql`
+
 ## Database Setup
 
 Run the schema script first to create the required tables and sample data for a challenge:
@@ -121,6 +137,13 @@ SOURCE LeetCode/0178_rank_scores/schema.sql;
 SOURCE LeetCode/0178_rank_scores/solution.sql;
 ```
 
+For the consecutive-numbers challenge:
+
+```sql
+SOURCE LeetCode/0180_consecutive_numbers/schema.sql;
+SOURCE LeetCode/0180_consecutive_numbers/solution.sql;
+```
+
 If you are using a MySQL client directly, the equivalent commands are:
 
 ```bash
@@ -135,6 +158,9 @@ mysql -u <username> -p < LeetCode/0177_nth_highest_salary/solution.sql
 
 mysql -u <username> -p < LeetCode/0178_rank_scores/schema.sql
 mysql -u <username> -p < LeetCode/0178_rank_scores/solution.sql
+
+mysql -u <username> -p < LeetCode/0180_consecutive_numbers/schema.sql
+mysql -u <username> -p < LeetCode/0180_consecutive_numbers/solution.sql
 ```
 
 ## How the Solutions Work
@@ -212,12 +238,36 @@ This ensures:
 - ranks remain consecutive with no gaps
 - results are returned in descending score order
 
+### Window-function approach for Consecutive Numbers
+
+```sql
+WITH ConsecutiveCheck AS (
+    SELECT
+        num,
+        LAG(num, 1) OVER (ORDER BY id) AS prev_num,
+        LEAD(num, 1) OVER (ORDER BY id) AS next_num
+    FROM Logs
+)
+SELECT DISTINCT
+    num AS ConsecutiveNums
+FROM ConsecutiveCheck
+WHERE num = prev_num
+  AND num = next_num;
+```
+
+This ensures:
+- each value is compared with the values immediately before and after it
+- only repeated values that remain unchanged across three consecutive rows are kept
+- `DISTINCT` prevents duplicate values from appearing multiple times in a run
+
 ## Goals
 
 This repository is intended to:
 
 - strengthen SQL fundamentals
 - practice reading and writing production-style queries
+- compare common patterns such as joins, window functions, and subqueries
+- build confidence solving LeetCode-style SQL challenges in a structured way
 - build a reusable archive of challenge-based solutions
 - document problem-solving logic clearly and consistently
 
