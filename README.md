@@ -11,13 +11,14 @@ Each problem folder contains:
 - `schema.sql` — table definitions and sample data
 - `solution.sql` — the query logic used to solve the challenge
 
-The repository currently includes solutions for five classic SQL problems:
+The repository currently includes solutions for six classic SQL problems:
 
 - `Combine Two Tables`
 - `Second Highest Salary`
 - `Nth Highest Salary`
 - `Rank Scores`
 - `Consecutive Numbers`
+- `Employees Earning More Than Their Managers`
 
 ## Repository Structure
 
@@ -37,7 +38,10 @@ advanced-sql-queries/
     ├── 0178_rank_scores/
     │   ├── schema.sql
     │   └── solution.sql
-    └── 0180_consecutive_numbers/
+    ├── 0180_consecutive_numbers/
+    │   ├── schema.sql
+    │   └── solution.sql
+    └── 0181_employees_earning_more_than_their_managers/
         ├── schema.sql
         └── solution.sql
 ```
@@ -102,6 +106,18 @@ Key concept:
 The solution is implemented in:
 - `LeetCode/0180_consecutive_numbers/solution.sql`
 
+### LeetCode 181: Employees Earning More Than Their Managers
+
+This problem demonstrates how to compare employee salaries with those of their managers using a self-join.
+
+Key concept:
+- Join `Employee` to itself to connect each employee with the row identified by `managerId`
+- Exclude top-level employees whose `managerId` is `NULL`
+- Filter for employees whose salary is greater than their manager's salary
+
+The solution is implemented in:
+- `LeetCode/0181_employees_earning_more_than_their_managers/solution.sql`
+
 ## Database Setup
 
 Run the schema script first to create the required tables and sample data for a challenge:
@@ -144,6 +160,13 @@ SOURCE LeetCode/0180_consecutive_numbers/schema.sql;
 SOURCE LeetCode/0180_consecutive_numbers/solution.sql;
 ```
 
+For the employees-earning-more-than-managers challenge:
+
+```sql
+SOURCE LeetCode/0181_employees_earning_more_than_their_managers/schema.sql;
+SOURCE LeetCode/0181_employees_earning_more_than_their_managers/solution.sql;
+```
+
 If you are using a MySQL client directly, the equivalent commands are:
 
 ```bash
@@ -161,6 +184,9 @@ mysql -u <username> -p < LeetCode/0178_rank_scores/solution.sql
 
 mysql -u <username> -p < LeetCode/0180_consecutive_numbers/schema.sql
 mysql -u <username> -p < LeetCode/0180_consecutive_numbers/solution.sql
+
+mysql -u <username> -p < LeetCode/0181_employees_earning_more_than_their_managers/schema.sql
+mysql -u <username> -p < LeetCode/0181_employees_earning_more_than_their_managers/solution.sql
 ```
 
 ## How the Solutions Work
@@ -259,6 +285,22 @@ This ensures:
 - each value is compared with the values immediately before and after it
 - only repeated values that remain unchanged across three consecutive rows are kept
 - `DISTINCT` prevents duplicate values from appearing multiple times in a run
+
+### Self-join approach for Employees Earning More Than Their Managers
+
+```sql
+SELECT
+    e.name AS Employee
+FROM Employee e
+INNER JOIN Employee m
+    ON e.managerId = m.id
+WHERE e.salary > m.salary;
+```
+
+This ensures:
+- each employee is paired with the matching manager row
+- employees without a manager are excluded naturally
+- only employees earning more than their manager are returned
 
 ## Goals
 
