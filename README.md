@@ -11,7 +11,7 @@ Each problem folder contains:
 - `schema.sql` — table definitions and sample data
 - `solution.sql` — the query logic used to solve the challenge
 
-The repository currently includes solutions for six classic SQL problems:
+The repository currently includes solutions for seven classic SQL problems:
 
 - `Combine Two Tables`
 - `Second Highest Salary`
@@ -19,6 +19,7 @@ The repository currently includes solutions for six classic SQL problems:
 - `Rank Scores`
 - `Consecutive Numbers`
 - `Employees Earning More Than Their Managers`
+- `Duplicate Emails`
 
 ## Repository Structure
 
@@ -29,6 +30,9 @@ advanced-sql-queries/
     ├── 0175_combine_two_tables/
     │   ├── schema.sql
     │   └── solution.sql
+    └── 0182_duplicate_emails/
+        ├── schema.sql
+        └── solution.sql
     ├── 0176_second_highest_salary/
     │   ├── schema.sql
     │   └── solution.sql
@@ -118,6 +122,17 @@ Key concept:
 The solution is implemented in:
 - `LeetCode/0181_employees_earning_more_than_their_managers/solution.sql`
 
+### LeetCode 182: Duplicate Emails
+
+This problem demonstrates how to identify email addresses that occur more than once.
+
+Key concept:
+- Group rows by email
+- Use `HAVING COUNT(*) > 1` to return only duplicate email addresses
+
+The solution is implemented in:
+- `LeetCode/0182_duplicate_emails/solution.sql`
+
 ## Database Setup
 
 Run the schema script first to create the required tables and sample data for a challenge:
@@ -167,6 +182,13 @@ SOURCE LeetCode/0181_employees_earning_more_than_their_managers/schema.sql;
 SOURCE LeetCode/0181_employees_earning_more_than_their_managers/solution.sql;
 ```
 
+For the duplicate-emails challenge:
+
+```sql
+SOURCE LeetCode/0182_duplicate_emails/schema.sql;
+SOURCE LeetCode/0182_duplicate_emails/solution.sql;
+```
+
 If you are using a MySQL client directly, the equivalent commands are:
 
 ```bash
@@ -187,6 +209,9 @@ mysql -u <username> -p < LeetCode/0180_consecutive_numbers/solution.sql
 
 mysql -u <username> -p < LeetCode/0181_employees_earning_more_than_their_managers/schema.sql
 mysql -u <username> -p < LeetCode/0181_employees_earning_more_than_their_managers/solution.sql
+
+mysql -u <username> -p < LeetCode/0182_duplicate_emails/schema.sql
+mysql -u <username> -p < LeetCode/0182_duplicate_emails/solution.sql
 ```
 
 ## How the Solutions Work
@@ -301,6 +326,20 @@ This ensures:
 - each employee is paired with the matching manager row
 - employees without a manager are excluded naturally
 - only employees earning more than their manager are returned
+
+### Grouping approach for Duplicate Emails
+
+```sql
+SELECT
+    email AS Email
+FROM Person
+GROUP BY email
+HAVING COUNT(*) > 1;
+```
+
+This ensures:
+- each email address is considered as a group
+- only email addresses occurring more than once are returned
 
 ## Goals
 
