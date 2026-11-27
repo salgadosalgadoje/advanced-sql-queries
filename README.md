@@ -11,7 +11,7 @@ Each problem folder contains:
 - `schema.sql` — table definitions and sample data
 - `solution.sql` — the query logic used to solve the challenge
 
-The repository currently includes solutions for seven classic SQL problems:
+The repository currently includes solutions for eight classic SQL problems:
 
 - `Combine Two Tables`
 - `Second Highest Salary`
@@ -20,6 +20,7 @@ The repository currently includes solutions for seven classic SQL problems:
 - `Consecutive Numbers`
 - `Employees Earning More Than Their Managers`
 - `Duplicate Emails`
+- `Customers Who Never Order`
 
 ## Repository Structure
 
@@ -30,9 +31,6 @@ advanced-sql-queries/
     ├── 0175_combine_two_tables/
     │   ├── schema.sql
     │   └── solution.sql
-    └── 0182_duplicate_emails/
-        ├── schema.sql
-        └── solution.sql
     ├── 0176_second_highest_salary/
     │   ├── schema.sql
     │   └── solution.sql
@@ -45,7 +43,13 @@ advanced-sql-queries/
     ├── 0180_consecutive_numbers/
     │   ├── schema.sql
     │   └── solution.sql
-    └── 0181_employees_earning_more_than_their_managers/
+    ├── 0181_employees_earning_more_than_their_managers/
+    │   ├── schema.sql
+    │   └── solution.sql
+    ├── 0182_duplicate_emails/
+    │   ├── schema.sql
+    │   └── solution.sql
+    └── 0183_customers_who_never_order/
         ├── schema.sql
         └── solution.sql
 ```
@@ -133,6 +137,18 @@ Key concept:
 The solution is implemented in:
 - `LeetCode/0182_duplicate_emails/solution.sql`
 
+### LeetCode 183: Customers Who Never Order
+
+This problem demonstrates how to find records from one table that have no matching row in another table.
+
+Key concept:
+- Use a `LEFT JOIN` to preserve every customer
+- Match orders through `customerId`
+- Filter with `o.id IS NULL` to keep customers who have never placed an order
+
+The solution is implemented in:
+- `LeetCode/0183_customers_who_never_order/solution.sql`
+
 ## Database Setup
 
 Run the schema script first to create the required tables and sample data for a challenge:
@@ -189,6 +205,13 @@ SOURCE LeetCode/0182_duplicate_emails/schema.sql;
 SOURCE LeetCode/0182_duplicate_emails/solution.sql;
 ```
 
+For the customers-who-never-order challenge:
+
+```sql
+SOURCE LeetCode/0183_customers_who_never_order/schema.sql;
+SOURCE LeetCode/0183_customers_who_never_order/solution.sql;
+```
+
 If you are using a MySQL client directly, the equivalent commands are:
 
 ```bash
@@ -212,6 +235,9 @@ mysql -u <username> -p < LeetCode/0181_employees_earning_more_than_their_manager
 
 mysql -u <username> -p < LeetCode/0182_duplicate_emails/schema.sql
 mysql -u <username> -p < LeetCode/0182_duplicate_emails/solution.sql
+
+mysql -u <username> -p < LeetCode/0183_customers_who_never_order/schema.sql
+mysql -u <username> -p < LeetCode/0183_customers_who_never_order/solution.sql
 ```
 
 ## How the Solutions Work
@@ -340,6 +366,22 @@ HAVING COUNT(*) > 1;
 This ensures:
 - each email address is considered as a group
 - only email addresses occurring more than once are returned
+
+### Left anti-join approach for Customers Who Never Order
+
+```sql
+SELECT
+    c.name AS Customers
+FROM Customers c
+LEFT JOIN Orders o
+    ON c.id = o.customerId
+WHERE o.id IS NULL;
+```
+
+This ensures:
+- every customer is considered
+- customers with matching orders are excluded
+- customers with no matching order remain in the result set
 
 ## Goals
 
